@@ -1,0 +1,20 @@
+# server/Dockerfile.dev
+FROM node:18-alpine
+
+# Set a working directory specific to the server code
+WORKDIR /usr/src/app/server
+
+# Copy server's package files and install dependencies
+COPY server/package*.json ./
+RUN npm install
+
+# We do NOT copy server/src here, as it will be volume-mounted for live editing.
+# We also do NOT copy frontend/dist or frontend/public, as these will be
+# volume-mounted from the host (via /usr/src/app/frontend) and populated
+# by the frontend build process or dev server.
+
+EXPOSE 8080
+
+# The default command to run when the container starts.
+# This will execute `nodemon src/index.js` from the server's package.json.
+CMD ["npm", "run", "dev"]

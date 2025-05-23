@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: labsaiimi/myapp-frontend:${TAG:-latest}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm start
+
+  server:
+    build:
+      context: . # Root context
+      dockerfile: server/Dockerfile
+    image: labsaiimi/my-ssr-app-server:${TAG:-latest}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - frontend
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: labsaiimi/my-ssr-app-nginx:${TAG:-latest}
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - server
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

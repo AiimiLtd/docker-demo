@@ -1,0 +1,24 @@
+{
+    "name": "Node.js, React, Nginx Dev",
+    "dockerComposeFile": "docker-compose.dev.yml",
+    "service": "server", // The primary service VS Code should attach to
+    "workspaceFolder": "/workspace",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "dbaeumer.vscode-eslint",
+          "esbenp.prettier-vscode",
+          "ms-azuretools.vscode-docker",
+          "eamodio.gitlens"
+        ],
+        "settings": {
+          "remote.containers.executeInWSL": true, // If using WSL
+          "terminal.integrated.shell.linux": "/bin/sh" // Alpine uses sh
+        }
+      }
+    },
+    "forwardPorts": [80, 3000, 8080], // Forward Nginx, React Dev Server, Node server
+    "postCreateCommand": "echo 'Dev container created! Ensure frontend dependencies are installed (npm install in /workspace/frontend) and server dependencies (/workspace/server).' && cd /workspace/frontend && npm install && cd /workspace/server && npm install && (cd /workspace/frontend && npm run build)", // Build frontend so server can SSR
+    // "postStartCommand": "cd /workspace/frontend && npm run dev & cd /workspace/server && npm run dev", // Optional: auto-start dev servers
+    "shutdownAction": "stopCompose"
+  }

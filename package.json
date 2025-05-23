@@ -1,0 +1,16 @@
+{
+  "name": "container-sample",
+  "version": "1.0.0",
+  "main": "compose-dev.js",
+  "type": "module",
+  "scripts": {
+      "start": "node compose-dev.js",
+      "publish": "node build-publish.js",
+      "prod": "node compose-prod.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "project": "myapp",
+  "dockerAccount": "labsaiimi"
+}

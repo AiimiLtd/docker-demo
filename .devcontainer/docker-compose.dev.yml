@@ -1,0 +1,57 @@
+services:
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+    container_name: myapp_frontend
+    ports:
+      - "3000:3000" # Webpack dev server
+    volumes:
+      - ../frontend:/usr/src/app # Mount local code
+      - /usr/src/app/node_modules # Keep container's node_modules separate
+    command: npm start # Starts webpack-dev-server and watches for changes
+                        # This will build into memory, server needs disk build.
+                        # For SSR, it's better if the server can access built files.
+                        # So also run `npm run build` in frontend occasionally or as postCreate.
+
+  server:
+    build:
+      context: .. # Build context is the project root
+      dockerfile: server/Dockerfile.dev # Using the production Dockerfile as a base
+    container_name: myapp_server
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../server:/usr/src/app/server # Mount server source
+      - ../frontend:/usr/src/app/frontend # Mount frontend source (for SSR to access src/App.js and public/index.html)
+      # If server/Dockerfile copies frontend/dist, ensure it's built or mount it:
+      # - ../frontend/dist:/usr/src/app/frontend/dist
+      - /usr/src/app/server/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+    depends_on:
+      - frontend # server might depend on frontend's build artifacts
+    command: npm run dev # (cd /usr/src/app/server && npm run dev)
+
+  nginx:
+    build:
+      context: ../nginx
+    container_name: myapp_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro # Mount Nginx config for easy changes
+      # If Nginx needs to serve static files directly from frontend/dist:
+      # - ../frontend/dist:/var/www/frontend/dist:ro
+    depends_on:
+      - server
+      - frontend # If proxying to webpack-dev-server
+
+volumes:
+  frontend_node_modules:
+  server_node_modules:
+
+# Define the workspace root for VS Code dev container
+x-vscode:
+  workspaceFolder: /workspace

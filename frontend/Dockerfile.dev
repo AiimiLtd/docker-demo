@@ -1,0 +1,13 @@
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+
+# We'll mount package.json and install in compose, or copy and install if preferred
+COPY package*.json ./
+RUN npm install
+
+# Bundle app source (though it will be mounted in dev)
+COPY . .
+
+# No CMD here, will be overridden in docker-compose.dev.yml
+# EXPOSE 3000 # Exposed by webpack-dev-server, but we'll access through Nginx
