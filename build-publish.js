@@ -43,7 +43,7 @@ async function main() {
 
     // 1. Build the React frontend
     console.log('\nStep 1: Building React frontend...');
-    execSync('npm run build', { cwd: path.join(__dirname, 'frontend'), stdio: 'inherit' });
+    execSync('npm run build', { cwd: path.resolve('./frontend'), stdio: 'inherit' });
     console.log('React frontend built successfully.');
 
     // Define image tags
